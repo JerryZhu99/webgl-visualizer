@@ -68,14 +68,14 @@ function drawFrameBuffer(gl, programInfo, buffers, framebuffer, framebuffer2) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
     gl.vertexAttribPointer(
-      programInfo.attribLocations.vertexPosition,
+      programInfo.attribLocations.aVertexPosition,
       numComponents,
       type,
       normalize,
       stride,
       offset);
     gl.enableVertexAttribArray(
-      programInfo.attribLocations.vertexPosition);
+      programInfo.attribLocations.aVertexPosition);
   }
   {
     const numComponents = 2;
@@ -85,24 +85,24 @@ function drawFrameBuffer(gl, programInfo, buffers, framebuffer, framebuffer2) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textures);
     gl.vertexAttribPointer(
-      programInfo.attribLocations.textureCoord,
+      programInfo.attribLocations.aTextureCoord,
       numComponents,
       type,
       normalize,
       stride,
       offset);
     gl.enableVertexAttribArray(
-      programInfo.attribLocations.textureCoord);
+      programInfo.attribLocations.aTextureCoord);
   }
 
   gl.useProgram(programInfo.program);
 
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.projectionMatrix,
+    programInfo.uniformLocations.uProjectionMatrix,
     false,
     projectionMatrix);
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.modelViewMatrix,
+    programInfo.uniformLocations.uModelViewMatrix,
     false,
     modelViewMatrix);
 

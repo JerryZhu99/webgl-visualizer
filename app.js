@@ -76,14 +76,14 @@ function drawScene(gl, programInfo, buffers) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
     gl.vertexAttribPointer(
-      programInfo.attribLocations.vertexPosition,
+      programInfo.attribLocations.aVertexPosition,
       numComponents,
       type,
       normalize,
       stride,
       offset);
     gl.enableVertexAttribArray(
-      programInfo.attribLocations.vertexPosition);
+      programInfo.attribLocations.aVertexPosition);
   }
   {
     const numComponents = 4;
@@ -93,24 +93,24 @@ function drawScene(gl, programInfo, buffers) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
     gl.vertexAttribPointer(
-      programInfo.attribLocations.vertexColor,
+      programInfo.attribLocations.aVertexColor,
       numComponents,
       type,
       normalize,
       stride,
       offset);
     gl.enableVertexAttribArray(
-      programInfo.attribLocations.vertexColor);
+      programInfo.attribLocations.aVertexColor);
   }
 
   gl.useProgram(programInfo.program);
 
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.projectionMatrix,
+    programInfo.uniformLocations.uProjectionMatrix,
     false,
     projectionMatrix);
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.modelViewMatrix,
+    programInfo.uniformLocations.uModelViewMatrix,
     false,
     modelViewMatrix);
 
@@ -135,86 +135,30 @@ if (gl === null) {
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
 gl.clear(gl.COLOR_BUFFER_BIT);
 
-const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+const programInfo = getShaderProgram(gl, vsSource, fsSource,
+  ['aVertexPosition', 'aVertexColor', 'aTextureCoord'],
+  ['uProjectionMatrix', 'uModelViewMatrix', 'uSampler'],
+);
 
-const programInfo = {
-  program: shaderProgram,
-  attribLocations: {
-    vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-    vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
-    textureCoord: gl.getAttribLocation(shaderProgram, 'aTextureCoord'),
-  },
-  uniformLocations: {
-    projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-    modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-    uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
-  },
-};
+const programInfoThreshold = getShaderProgram(gl, vsSource, fsThresholdSource,
+  ['aVertexPosition', 'aVertexColor', 'aTextureCoord'],
+  ['uProjectionMatrix', 'uModelViewMatrix', 'uSampler'],
+);
 
+const programInfoBlurH = getShaderProgram(gl, vsBlurSource, fsBlurHSource,
+  ['aVertexPosition', 'aVertexColor', 'aTextureCoord'],
+  ['uProjectionMatrix', 'uModelViewMatrix', 'uSampler'],
+);
 
-const shaderProgramThreshold = initShaderProgram(gl, vsSource, fsThresholdSource);
+const programInfoBlurV = getShaderProgram(gl, vsBlurSource, fsBlurVSource,
+  ['aVertexPosition', 'aVertexColor', 'aTextureCoord'],
+  ['uProjectionMatrix', 'uModelViewMatrix', 'uSampler'],
+);
 
-const programInfoThreshold = {
-  program: shaderProgramThreshold,
-  attribLocations: {
-    vertexPosition: gl.getAttribLocation(shaderProgramThreshold, 'aVertexPosition'),
-    vertexColor: gl.getAttribLocation(shaderProgramThreshold, 'aVertexColor'),
-    textureCoord: gl.getAttribLocation(shaderProgramThreshold, 'aTextureCoord'),
-  },
-  uniformLocations: {
-    projectionMatrix: gl.getUniformLocation(shaderProgramThreshold, 'uProjectionMatrix'),
-    modelViewMatrix: gl.getUniformLocation(shaderProgramThreshold, 'uModelViewMatrix'),
-    uSampler: gl.getUniformLocation(shaderProgramThreshold, 'uSampler'),
-  },
-};
-const shaderProgramBlurH = initShaderProgram(gl, vsBlurSource, fsBlurHSource);
-
-const programInfoBlurH = {
-  program: shaderProgramBlurH,
-  attribLocations: {
-    vertexPosition: gl.getAttribLocation(shaderProgramBlurH, 'aVertexPosition'),
-    vertexColor: gl.getAttribLocation(shaderProgramBlurH, 'aVertexColor'),
-    textureCoord: gl.getAttribLocation(shaderProgramBlurH, 'aTextureCoord'),
-  },
-  uniformLocations: {
-    projectionMatrix: gl.getUniformLocation(shaderProgramBlurH, 'uProjectionMatrix'),
-    modelViewMatrix: gl.getUniformLocation(shaderProgramBlurH, 'uModelViewMatrix'),
-    uSampler: gl.getUniformLocation(shaderProgramBlurH, 'uSampler'),
-  },
-};
-
-const shaderProgramBlurV = initShaderProgram(gl, vsBlurSource, fsBlurVSource);
-
-const programInfoBlurV = {
-  program: shaderProgramBlurV,
-  attribLocations: {
-    vertexPosition: gl.getAttribLocation(shaderProgramBlurV, 'aVertexPosition'),
-    vertexColor: gl.getAttribLocation(shaderProgramBlurV, 'aVertexColor'),
-    textureCoord: gl.getAttribLocation(shaderProgramBlurV, 'aTextureCoord'),
-  },
-  uniformLocations: {
-    projectionMatrix: gl.getUniformLocation(shaderProgramBlurV, 'uProjectionMatrix'),
-    modelViewMatrix: gl.getUniformLocation(shaderProgramBlurV, 'uModelViewMatrix'),
-    uSampler: gl.getUniformLocation(shaderProgramBlurV, 'uSampler'),
-  },
-};
-
-const shaderProgramBlend = initShaderProgram(gl, vsSource, fsBlendSource);
-
-const programInfoBlend = {
-  program: shaderProgramBlend,
-  attribLocations: {
-    vertexPosition: gl.getAttribLocation(shaderProgramBlend, 'aVertexPosition'),
-    vertexColor: gl.getAttribLocation(shaderProgramBlend, 'aVertexColor'),
-    textureCoord: gl.getAttribLocation(shaderProgramBlend, 'aTextureCoord'),
-  },
-  uniformLocations: {
-    projectionMatrix: gl.getUniformLocation(shaderProgramBlend, 'uProjectionMatrix'),
-    modelViewMatrix: gl.getUniformLocation(shaderProgramBlend, 'uModelViewMatrix'),
-    uSampler: gl.getUniformLocation(shaderProgramBlend, 'uSampler'),
-    uSampler2: gl.getUniformLocation(shaderProgramBlend, 'uSampler2'),
-  },
-};
+const programInfoBlend = getShaderProgram(gl, vsSource, fsBlendSource,
+  ['aVertexPosition', 'aVertexColor', 'aTextureCoord'],
+  ['uProjectionMatrix', 'uModelViewMatrix', 'uSampler', 'uSampler2'],
+);
 
 const buffers = initBuffers(gl);
 const screenRectBuffers = initScreenRectBuffers(gl);

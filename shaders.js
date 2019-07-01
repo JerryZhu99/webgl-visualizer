@@ -189,3 +189,29 @@ function loadShader(gl, type, source) {
 
   return shader;
 }
+
+/**
+ *
+ * @param {WebGLRenderingContext} gl
+ * @param {string} vsSource
+ * @param {string} fsSource
+ * @param {string[]} attributes
+ * @param {string[]} uniforms
+ */
+function getShaderProgram(gl, vsSource, fsSource, attributes, uniforms) {
+  const program = initShaderProgram(gl, vsSource, fsSource);
+  const attribLocations = {};
+  for (let attribute of attributes) {
+    attribLocations[attribute] = gl.getAttribLocation(program, attribute);
+  }
+  const uniformLocations = {};
+  for (let uniform of uniforms) {
+    uniformLocations[uniform] = gl.getUniformLocation(program, uniform);
+  }
+
+  return {
+    program,
+    attribLocations,
+    uniformLocations,
+  }
+}
