@@ -31,6 +31,22 @@ const fsSource = `#version 300 es
   }
 `;
 
+const fsThresholdSource = `#version 300 es
+
+  in lowp vec4 vColor;
+  in highp vec2 vTextureCoord;
+
+  uniform sampler2D uSampler;
+
+  out lowp vec4 outColor;
+
+  void main() {
+    lowp float lightness = (min(vColor.r, min(vColor.g, vColor.b)) + max(vColor.r, max(vColor.g, vColor.b))) / 2.0;
+    outColor = vec4(vColor.rgb * smoothstep(0.5, 0.7, lightness), vColor.a);
+  }
+`;
+
+
 const vsBlurSource = `#version 300 es
 
   in vec4 aVertexPosition;
@@ -61,7 +77,7 @@ const fsBlurHSource = `#version 300 es
 
   void main() {
     highp ivec2 tex_size = textureSize(uSampler, 0);
-    highp vec2 tex_offset = vec2(1.0 / float(tex_size.x), 1.0 / float(tex_size.y));
+    highp vec2 tex_offset = vec2(1.0 / float(tex_size.x), 1.0 / float(tex_size.y)) * 2.0;
     outColor = vec4(0.0);
     outColor += texture(uSampler, vTextureCoord + vec2(tex_offset.x * -4.0, 0.0)) * 0.0162162162;
     outColor += texture(uSampler, vTextureCoord + vec2(tex_offset.x * -3.0, 0.0)) * 0.0540540541;
@@ -86,7 +102,7 @@ const fsBlurVSource = `#version 300 es
 
   void main() {
     highp ivec2 tex_size = textureSize(uSampler, 0);
-    highp vec2 tex_offset = vec2(1.0 / float(tex_size.x), 1.0 / float(tex_size.y));
+    highp vec2 tex_offset = vec2(1.0 / float(tex_size.x), 1.0 / float(tex_size.y)) * 2.0;
     outColor = vec4(0.0);
     outColor += texture(uSampler, vTextureCoord + vec2(0.0, tex_offset.y * -4.0)) * 0.0162162162;
     outColor += texture(uSampler, vTextureCoord + vec2(0.0, tex_offset.y * -3.0)) * 0.0540540541;
@@ -97,6 +113,23 @@ const fsBlurVSource = `#version 300 es
     outColor += texture(uSampler, vTextureCoord + vec2(0.0, tex_offset.y * 2.0)) * 0.1216216216;
     outColor += texture(uSampler, vTextureCoord + vec2(0.0, tex_offset.y * 3.0)) * 0.0540540541;
     outColor += texture(uSampler, vTextureCoord + vec2(0.0, tex_offset.y * 4.0)) * 0.0162162162;
+  }
+`;
+
+
+const fsBlendSource = `#version 300 es
+
+  in lowp vec4 vColor;
+  in highp vec2 vTextureCoord;
+
+  uniform sampler2D uSampler;
+  uniform sampler2D uSampler2;
+
+  out lowp vec4 outColor;
+
+  void main() {
+    outColor = vec4(1.0 - (1.0- texture(uSampler, vTextureCoord).rgb)
+     * (1.0-  texture(uSampler2, vTextureCoord).rgb), 1.0);
   }
 `;
 

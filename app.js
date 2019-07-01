@@ -151,6 +151,22 @@ const programInfo = {
   },
 };
 
+
+const shaderProgramThreshold = initShaderProgram(gl, vsSource, fsThresholdSource);
+
+const programInfoThreshold = {
+  program: shaderProgramThreshold,
+  attribLocations: {
+    vertexPosition: gl.getAttribLocation(shaderProgramThreshold, 'aVertexPosition'),
+    vertexColor: gl.getAttribLocation(shaderProgramThreshold, 'aVertexColor'),
+    textureCoord: gl.getAttribLocation(shaderProgramThreshold, 'aTextureCoord'),
+  },
+  uniformLocations: {
+    projectionMatrix: gl.getUniformLocation(shaderProgramThreshold, 'uProjectionMatrix'),
+    modelViewMatrix: gl.getUniformLocation(shaderProgramThreshold, 'uModelViewMatrix'),
+    uSampler: gl.getUniformLocation(shaderProgramThreshold, 'uSampler'),
+  },
+};
 const shaderProgramBlurH = initShaderProgram(gl, vsBlurSource, fsBlurHSource);
 
 const programInfoBlurH = {
@@ -183,23 +199,52 @@ const programInfoBlurV = {
   },
 };
 
+const shaderProgramBlend = initShaderProgram(gl, vsSource, fsBlendSource);
+
+const programInfoBlend = {
+  program: shaderProgramBlend,
+  attribLocations: {
+    vertexPosition: gl.getAttribLocation(shaderProgramBlend, 'aVertexPosition'),
+    vertexColor: gl.getAttribLocation(shaderProgramBlend, 'aVertexColor'),
+    textureCoord: gl.getAttribLocation(shaderProgramBlend, 'aTextureCoord'),
+  },
+  uniformLocations: {
+    projectionMatrix: gl.getUniformLocation(shaderProgramBlend, 'uProjectionMatrix'),
+    modelViewMatrix: gl.getUniformLocation(shaderProgramBlend, 'uModelViewMatrix'),
+    uSampler: gl.getUniformLocation(shaderProgramBlend, 'uSampler'),
+    uSampler2: gl.getUniformLocation(shaderProgramBlend, 'uSampler2'),
+  },
+};
 
 const buffers = initBuffers(gl);
 const screenRectBuffers = initScreenRectBuffers(gl);
 
+const sceneBuffer = generateFrameBuffer(gl);
+const thresholdBuffer = generateFrameBuffer(gl);
 const blurBufferH = generateFrameBuffer(gl);
 const blurBufferV = generateFrameBuffer(gl);
 
 const draw = () => {
+  gl.bindFramebuffer(gl.FRAMEBUFFER, sceneBuffer.buffer);
+  drawScene(gl, programInfo, buffers)
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, thresholdBuffer.buffer);
+  drawScene(gl, programInfoThreshold, buffers)
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferH.buffer);
-  drawScene(gl, programInfo, buffers);
+  drawFrameBuffer(gl, programInfoBlurH, screenRectBuffers, thresholdBuffer);
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferV.buffer);
-  drawFrameBuffer(gl, programInfoBlurH, screenRectBuffers, blurBufferH);
+  drawFrameBuffer(gl, programInfoBlurV, screenRectBuffers, blurBufferH);
+  for (let i = 0; i < 3; i++) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferH.buffer);
+    drawFrameBuffer(gl, programInfoBlurH, screenRectBuffers, blurBufferV);
 
+    gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferV.buffer);
+    drawFrameBuffer(gl, programInfoBlurV, screenRectBuffers, blurBufferH);
+  }
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  drawFrameBuffer(gl, programInfoBlurV, screenRectBuffers, blurBufferV);
+  drawFrameBuffer(gl, programInfoBlend, screenRectBuffers, sceneBuffer, blurBufferV);
 
   requestAnimationFrame(draw);
 }

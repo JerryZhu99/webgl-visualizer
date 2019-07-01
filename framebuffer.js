@@ -46,7 +46,7 @@ function generateFrameBuffer(gl) {
  * @param {WebGLRenderingContext} gl
  * @param {{texture: number, buffer: number}} framebuffer
  */
-function drawFrameBuffer(gl, programInfo, buffers, framebuffer) {
+function drawFrameBuffer(gl, programInfo, buffers, framebuffer, framebuffer2) {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
   gl.clearDepth(1.0);                 // Clear everything
   gl.enable(gl.DEPTH_TEST);           // Enable depth testing
@@ -106,9 +106,16 @@ function drawFrameBuffer(gl, programInfo, buffers, framebuffer) {
     false,
     modelViewMatrix);
 
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, framebuffer.texture);
-  gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+  if (programInfo.uniformLocations.uSampler) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, framebuffer.texture);
+    gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+  }
+  if (programInfo.uniformLocations.uSampler2) {
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, framebuffer2.texture);
+    gl.uniform1i(programInfo.uniformLocations.uSampler2, 1);
+  }
 
   {
     const offset = 0;
@@ -116,6 +123,9 @@ function drawFrameBuffer(gl, programInfo, buffers, framebuffer) {
     gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
   }
 }
+
+
+
 
 /**
  *
