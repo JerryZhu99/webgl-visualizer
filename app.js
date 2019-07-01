@@ -151,35 +151,56 @@ const programInfo = {
   },
 };
 
-const shaderProgramFramebuffer = initShaderProgram(gl, vsFramebufferSource, fsFramebufferSource);
+const shaderProgramBlurH = initShaderProgram(gl, vsBlurSource, fsBlurHSource);
 
-const programInfoFramebuffer = {
-  program: shaderProgramFramebuffer,
+const programInfoBlurH = {
+  program: shaderProgramBlurH,
   attribLocations: {
-    vertexPosition: gl.getAttribLocation(shaderProgramFramebuffer, 'aVertexPosition'),
-    vertexColor: gl.getAttribLocation(shaderProgramFramebuffer, 'aVertexColor'),
-    textureCoord: gl.getAttribLocation(shaderProgramFramebuffer, 'aTextureCoord'),
+    vertexPosition: gl.getAttribLocation(shaderProgramBlurH, 'aVertexPosition'),
+    vertexColor: gl.getAttribLocation(shaderProgramBlurH, 'aVertexColor'),
+    textureCoord: gl.getAttribLocation(shaderProgramBlurH, 'aTextureCoord'),
   },
   uniformLocations: {
-    projectionMatrix: gl.getUniformLocation(shaderProgramFramebuffer, 'uProjectionMatrix'),
-    modelViewMatrix: gl.getUniformLocation(shaderProgramFramebuffer, 'uModelViewMatrix'),
-    uSampler: gl.getUniformLocation(shaderProgramFramebuffer, 'uSampler'),
+    projectionMatrix: gl.getUniformLocation(shaderProgramBlurH, 'uProjectionMatrix'),
+    modelViewMatrix: gl.getUniformLocation(shaderProgramBlurH, 'uModelViewMatrix'),
+    uSampler: gl.getUniformLocation(shaderProgramBlurH, 'uSampler'),
   },
 };
+
+const shaderProgramBlurV = initShaderProgram(gl, vsBlurSource, fsBlurVSource);
+
+const programInfoBlurV = {
+  program: shaderProgramBlurV,
+  attribLocations: {
+    vertexPosition: gl.getAttribLocation(shaderProgramBlurV, 'aVertexPosition'),
+    vertexColor: gl.getAttribLocation(shaderProgramBlurV, 'aVertexColor'),
+    textureCoord: gl.getAttribLocation(shaderProgramBlurV, 'aTextureCoord'),
+  },
+  uniformLocations: {
+    projectionMatrix: gl.getUniformLocation(shaderProgramBlurV, 'uProjectionMatrix'),
+    modelViewMatrix: gl.getUniformLocation(shaderProgramBlurV, 'uModelViewMatrix'),
+    uSampler: gl.getUniformLocation(shaderProgramBlurV, 'uSampler'),
+  },
+};
+
 
 const buffers = initBuffers(gl);
 const screenRectBuffers = initScreenRectBuffers(gl);
 
-const framebuffer = generateFrameBuffer(gl);
+const blurBufferH = generateFrameBuffer(gl);
+const blurBufferV = generateFrameBuffer(gl);
 
 const draw = () => {
-  gl.bindTexture(gl.TEXTURE_2D, null);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.buffer);
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferH.buffer);
   drawScene(gl, programInfo, buffers);
 
+  gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferV.buffer);
+  drawFrameBuffer(gl, programInfoBlurH, screenRectBuffers, blurBufferH);
+
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  drawFrameBuffer(gl, programInfoFramebuffer, screenRectBuffers, framebuffer);
+  drawFrameBuffer(gl, programInfoBlurV, screenRectBuffers, blurBufferV);
+
   requestAnimationFrame(draw);
 }
 draw();
