@@ -3,19 +3,12 @@
  * @param {WebGLRenderingContext} gl
  */
 function initBuffers(gl) {
-  const positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
   const positions = [
     -1.0, 1.0,
     1.0, 1.0,
     -1.0, -1.0,
     1.0, -1.0,
   ];
-
-  gl.bufferData(gl.ARRAY_BUFFER,
-    new Float32Array(positions),
-    gl.STATIC_DRAW);
 
   const colors = [
     1.0, 1.0, 1.0, 1.0,    // white
@@ -24,14 +17,7 @@ function initBuffers(gl) {
     0.0, 0.0, 1.0, 1.0,    // blue
   ];
 
-  const colorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-
-  return {
-    position: positionBuffer,
-    color: colorBuffer,
-  };
+  return createBuffers(gl, positions, colors);
 }
 
 /**
@@ -68,57 +54,9 @@ function drawScene(gl, programInfo, buffers) {
 
   mat4.rotateY(modelViewMatrix, modelViewMatrix, Date.now() / 1000)
 
-  {
-    const numComponents = 2;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-    gl.vertexAttribPointer(
-      programInfo.attribLocations.aVertexPosition,
-      numComponents,
-      type,
-      normalize,
-      stride,
-      offset);
-    gl.enableVertexAttribArray(
-      programInfo.attribLocations.aVertexPosition);
-  }
-  {
-    const numComponents = 4;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-    gl.vertexAttribPointer(
-      programInfo.attribLocations.aVertexColor,
-      numComponents,
-      type,
-      normalize,
-      stride,
-      offset);
-    gl.enableVertexAttribArray(
-      programInfo.attribLocations.aVertexColor);
-  }
-
   gl.useProgram(programInfo.program);
 
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.uProjectionMatrix,
-    false,
-    projectionMatrix);
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.uModelViewMatrix,
-    false,
-    modelViewMatrix);
-
-  {
-    const offset = 0;
-    const vertexCount = 4;
-    gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
-  }
+  drawObject(gl, programInfo, { buffers }, modelViewMatrix, projectionMatrix);
 }
 
 
