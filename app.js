@@ -118,13 +118,13 @@ const draw = () => {
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferV.buffer);
   drawFrameBuffer(gl, programInfoBlurV, screenRectBuffers, blurBufferH);
-  for (let i = 0; i < 3; i++) {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferH.buffer);
-    drawFrameBuffer(gl, programInfoBlurH, screenRectBuffers, blurBufferV);
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferV.buffer);
-    drawFrameBuffer(gl, programInfoBlurV, screenRectBuffers, blurBufferH);
-  }
+  gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferH.buffer);
+  drawFrameBuffer(gl, programInfoBlurH, screenRectBuffers, blurBufferV);
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, blurBufferV.buffer);
+  drawFrameBuffer(gl, programInfoBlurV, screenRectBuffers, blurBufferH);
+
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   drawFrameBuffer(gl, programInfoBlend, screenRectBuffers, sceneBuffer, blurBufferV);
 
