@@ -3,21 +3,9 @@
  * @param {WebGLRenderingContext} gl
  */
 function initBuffers(gl) {
-  const positions = [
-    -1.0, 1.0,
-    1.0, 1.0,
-    -1.0, -1.0,
-    1.0, -1.0,
-  ];
+  const { vertices, colors, texCoords, indices } = circle(1);
 
-  const colors = [
-    1.0, 1.0, 1.0, 1.0,    // white
-    1.0, 0.0, 0.0, 1.0,    // red
-    0.0, 1.0, 0.0, 1.0,    // green
-    0.0, 0.0, 1.0, 1.0,    // blue
-  ];
-
-  return createBuffers(gl, positions, colors);
+  return createBuffers(gl, vertices, colors, texCoords, indices);
 }
 
 /**
